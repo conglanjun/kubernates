@@ -92,3 +92,63 @@ node         7         d9aed20b68a4   3 years ago     660MB
 
 ### 2.1.5 运行容器镜像
 
+运行镜像
+
+```shell
+docker run --name kubia-container -p 8080:8080 -d kubia
+curl localhost:8080
+---------------------
+You've hit 23e534095d05
+```
+
+23e534095d05作为主机名返回。不是宿主机的主机名，是docker容器ID。
+
+```shell
+docker ps
+---------------------
+CONTAINER ID   IMAGE     COMMAND         CREATED              STATUS              PORTS                    NAMES
+23e534095d05   kubia     "node app.js"   About a minute ago   Up About a minute   0.0.0.0:8080->8080/tcp   kubia-container
+---------------------
+docker inspect kubia-container // 查看容器的详细json信息
+```
+
+### 2.1.6 探索运行容器的内部
+
+```shell
+docker exec -it kubia-container bash
+```
+
+-i 确保输入流开放。-t 分配终端。
+
+```shell
+ps aux
+---------------------
+USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root          1  0.0  0.3 614432 26468 ?        Ssl  07:09   0:00 node app.js
+root         13  0.0  0.0  20244  3064 pts/0    Ss   07:14   0:00 bash
+root         19  0.0  0.0  17500  2040 pts/0    R+   07:15   0:00 ps aux
+```
+
+容器内看到三个进程。
+
+查看宿主机操作系统上的进程。
+
+```shell
+ps aux | grep app.js
+---------------------
+root      15049  0.0  0.3 614432 26468 ?        Ssl  07:09   0:00 node app.js
+azureus+  15478  0.0  0.0  11468  1100 pts/0    S+   07:16   0:00 grep --color=auto app.js
+```
+
+证明了运行在容器中的进程是运行在宿主机操作系统上的。且进程ID不同。容器使用独立的PID Linux命名空间并且有着独立的系列号，完全独立于进程树。也有独立的文件系统。
+
+### 2.1.7 停止和删除容器
+
+```shell
+docker stop kubia-container
+// 可以通过docker ps -a查看。-a查看所有的容器，包括运行中的和已经停止的。要删除容器运行docker rm
+docker rm kubia-container
+```
+
+### 2.1.8 向镜像仓库推送镜像
+
