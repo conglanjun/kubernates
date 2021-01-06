@@ -33,3 +33,9 @@ pod中的容器运行于同一个network命名空间中，so它们共享相同�
   2.Loopback接口可以配置地址，而且可以配置全1的掩码,可以节省宝贵的地址空间。
   3.Loopback接口不能封装任何链路层协议。）
 
+#### 介绍平坦pod间网络
+
+Kubernates集群中的所有pod都在同一个共享网络地址空间中如下图。着意味着每个pod都可以通过其他pod的IP地址来实现相互访问，他们之间没有NAT（网络地址转换）网关。当两个pod彼此之间发送网络数据包时，他们都会将对方的实际IP地址看作数据包中的源IP。
+
+<img src="./each_pod_ip_address.jpg" alt="each pod ip address" style="zoom:80%;" />
+
